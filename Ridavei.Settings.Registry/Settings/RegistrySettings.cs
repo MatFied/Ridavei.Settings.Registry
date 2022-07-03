@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Ridavei.Settings.Base;
 
-namespace Ridavei.Settings.InMemory.Settings
+namespace Ridavei.Settings.Registry.Settings
 {
     /// <summary>
     /// 

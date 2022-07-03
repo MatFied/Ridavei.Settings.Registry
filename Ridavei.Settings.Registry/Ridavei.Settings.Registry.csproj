@@ -9,7 +9,7 @@
 		<FileVersion>1.0.0.0</FileVersion>
 		<Authors>Mateusz Fiedorowicz</Authors>
 		<Copyright>Mateusz Fiedorowicz</Copyright>
-		<Description>Builder extension to store settings keys and values in a Registry.</Description>
+		<Description>Builder extension to store settings keys and values in Windows Registry.</Description>
 		<RepositoryUrl>https://github.com/MatFied/Ridavei.Settings.Registry.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

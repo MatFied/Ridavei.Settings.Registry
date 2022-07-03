@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Ridavei.Settings.InMemory.Manager;
+using Ridavei.Settings.Registry.Manager;
 
 namespace Ridavei.Settings.Registry
 {

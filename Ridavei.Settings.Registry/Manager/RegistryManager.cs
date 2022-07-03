@@ -1,8 +1,8 @@
 ﻿using Ridavei.Settings.Base;
-using Ridavei.Settings.InMemory.Settings;
+using Ridavei.Settings.Registry.Settings;
 using Ridavei.Settings.Interface;
 
-namespace Ridavei.Settings.InMemory.Manager
+namespace Ridavei.Settings.Registry.Manager
 {
     /// <summary>
     /// In memory manager class used to retrieve settings using <see cref="RegistrySettings"/>.
