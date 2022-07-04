@@ -10,7 +10,7 @@ using Microsoft.Win32;
 namespace Ridavei.Settings.Registry.Settings
 {
     /// <summary>
-    /// 
+    /// Windows Registry settings class that uses <see cref="Microsoft.Win32.Registry"/> for storing keys and values.
     /// </summary>
     internal class RegistrySettings : ASettings
     {
@@ -21,12 +21,11 @@ namespace Ridavei.Settings.Registry.Settings
         /// The default constructor for <see cref="RegistrySettings"/> class.
         /// </summary>
         /// <param name="dictionaryName">Name of the dictionary</param>
-        /// <param name="registerKey">Registry base</param>
+        /// <param name="registryKey">Registry base</param>
         /// <exception cref="ArgumentNullException">Throwed when the name of the dictionary is null, empty or whitespace.</exception>
-        /// <exception cref="NotSupportedException">Throwed when the selected <see cref="RegistryKeyType"/> was not supported.</exception>
-        public RegistrySettings(string dictionaryName, RegistryKey registerKey) : base(dictionaryName)
+        public RegistrySettings(string dictionaryName, RegistryKey registryKey) : base(dictionaryName)
         {
-            _registryKey = OpenDesiredSubKey(registerKey, dictionaryName);
+            _registryKey = OpenSubKey(registryKey, dictionaryName);
         }
 
         /// <summary>
@@ -66,7 +65,13 @@ namespace Ridavei.Settings.Registry.Settings
             return res;
         }
 
-        private RegistryKey OpenDesiredSubKey(RegistryKey registryKey, string dictionaryName)
+        /// <summary>
+        /// Opens or creates registry sub key for the specific dictionary name.
+        /// </summary>
+        /// <param name="registryKey">Registry base</param>
+        /// <param name="dictionaryName">Name of the dictionary</param>
+        /// <returns></returns>
+        private RegistryKey OpenSubKey(RegistryKey registryKey, string dictionaryName)
         {
             string subKeyName = string.Concat(SubKeyName, "\\", dictionaryName);
             var res = registryKey.OpenSubKey(subKeyName, true);

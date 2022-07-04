@@ -23,25 +23,8 @@ namespace Ridavei.Settings.Registry.Tests
             RemoveSubKeyTrees();
         }
 
-        private void RemoveSubKeyTrees()
-        {
-            RemoveSubKeyTree(Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SubKeyName, true));
-            RemoveSubKeyTree(Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SubKeyName, true));
-        }
-
-        private void RemoveSubKeyTree(RegistryKey registryKey)
-        {
-            if (registryKey == null)
-                return;
-            using (registryKey)
-            {
-                registryKey.DeleteSubKeyTree(string.Empty, false);
-                registryKey.Flush();
-            }
-        }
-
         [Test]
-        public static void UseRegistryManager_NonSupportedType__RaiseException()
+        public void UseRegistryManager_NonSupportedType__RaiseException()
         {
             Should.Throw<NotSupportedException>(() =>
             {
@@ -53,7 +36,7 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public static void UseRegistryManager__RetrieveSettings(RegistryKeyType registryKeyType)
+        public void UseRegistryManager__RetrieveSettings(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
@@ -67,7 +50,7 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public static void UseRegistryManager_Set__NoException(RegistryKeyType registryKeyType)
+        public void UseRegistryManager_Set__NoException(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
@@ -82,7 +65,7 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public static void UseRegistryManager_Get__GetValue(RegistryKeyType registryKeyType)
+        public void UseRegistryManager_Get__GetValue(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
@@ -100,7 +83,7 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public static void UseRegistryManager_GetAll_Empty__GetEmptyDictionary(RegistryKeyType registryKeyType)
+        public void UseRegistryManager_GetAll_Empty__GetEmptyDictionary(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
@@ -117,7 +100,7 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public static void UseRegistryManager_GetAll__GetDictionary(RegistryKeyType registryKeyType)
+        public void UseRegistryManager_GetAll__GetDictionary(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
@@ -135,6 +118,23 @@ namespace Ridavei.Settings.Registry.Tests
                 dict.ContainsKey(key).ShouldBeTrue();
                 dict[key].ShouldBe(value);
             });
+        }
+
+        private void RemoveSubKeyTrees()
+        {
+            RemoveSubKeyTree(Microsoft.Win32.Registry.CurrentUser.OpenSubKey(SubKeyName, true));
+            RemoveSubKeyTree(Microsoft.Win32.Registry.LocalMachine.OpenSubKey(SubKeyName, true));
+        }
+
+        private void RemoveSubKeyTree(RegistryKey registryKey)
+        {
+            if (registryKey == null)
+                return;
+            using (registryKey)
+            {
+                registryKey.DeleteSubKeyTree(string.Empty, false);
+                registryKey.Flush();
+            }
         }
     }
 }

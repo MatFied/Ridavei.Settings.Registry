@@ -14,12 +14,12 @@ namespace Ridavei.Settings.Registry
         /// Allows to use <see cref="RegistryManager"/> as the manager class.
         /// </summary>
         /// <param name="builder">Builder</param>
-        /// <param name="registerKeyType">Registry base (default <see cref="RegistryKeyType.CurrentUser"/>)</param>
+        /// <param name="registryKeyType">Registry base (default <see cref="RegistryKeyType.CurrentUser"/>)</param>
         /// <returns>Builder</returns>
         /// <exception cref="NotSupportedException">Throwed when the selected <see cref="RegistryKeyType"/> was not supported.</exception>
-        public static SettingsBuilder UseRegistryManager(this SettingsBuilder builder, RegistryKeyType registerKeyType = RegistryKeyType.CurrentUser)
+        public static SettingsBuilder UseRegistryManager(this SettingsBuilder builder, RegistryKeyType registryKeyType = RegistryKeyType.CurrentUser)
         {
-            return builder.SetManager(new RegistryManager(registerKeyType));
+            return builder.SetManager(new RegistryManager(registryKeyType));
         }
     }
 }

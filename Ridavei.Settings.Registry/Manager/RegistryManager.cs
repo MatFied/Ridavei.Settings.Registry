@@ -1,14 +1,17 @@
-﻿using Ridavei.Settings.Base;
+﻿using System;
+
 using Ridavei.Settings.Registry.Enums;
 using Ridavei.Settings.Registry.Settings;
+
+using Ridavei.Settings.Base;
 using Ridavei.Settings.Interface;
+
 using Microsoft.Win32;
-using System;
 
 namespace Ridavei.Settings.Registry.Manager
 {
     /// <summary>
-    /// In memory manager class used to retrieve settings using <see cref="RegistrySettings"/>.
+    /// Windows Registry manager class used to retrieve settings using <see cref="RegistrySettings"/>.
     /// </summary>
     internal class RegistryManager : AManager
     {
@@ -17,10 +20,10 @@ namespace Ridavei.Settings.Registry.Manager
         /// <summary>
         /// The default constructor for <see cref="RegistryManager"/> class.
         /// </summary>
-        /// <param name="registerKeyType">Registry base</param>
-        public RegistryManager(RegistryKeyType registerKeyType) : base()
+        /// <param name="registryKeyType">Registry base</param>
+        public RegistryManager(RegistryKeyType registryKeyType) : base()
         {
-            _registerKey = GetRegistryBase(registerKeyType);
+            _registerKey = GetRegistryBase(registryKeyType);
         }
 
         /// <summary>
