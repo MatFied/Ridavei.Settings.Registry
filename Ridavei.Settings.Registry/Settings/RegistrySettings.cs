@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Ridavei.Settings.Registry.Enums;
+
 using Ridavei.Settings.Base;
+
+using Microsoft.Win32;
 
 namespace Ridavei.Settings.Registry.Settings
 {
@@ -10,14 +14,20 @@ namespace Ridavei.Settings.Registry.Settings
     /// </summary>
     internal class RegistrySettings : ASettings
     {
-        private readonly Dictionary<string, string> keyValues = new Dictionary<string, string>();
+        private const string SubKeyName = "Software\\Ridavei\\Settings";
+        private readonly RegistryKey _registryKey;
 
         /// <summary>
         /// The default constructor for <see cref="RegistrySettings"/> class.
         /// </summary>
         /// <param name="dictionaryName">Name of the dictionary</param>
+        /// <param name="registerKey">Registry base</param>
         /// <exception cref="ArgumentNullException">Throwed when the name of the dictionary is null, empty or whitespace.</exception>
-        public RegistrySettings(string dictionaryName) : base(dictionaryName) { }
+        /// <exception cref="NotSupportedException">Throwed when the selected <see cref="RegistryKeyType"/> was not supported.</exception>
+        public RegistrySettings(string dictionaryName, RegistryKey registerKey) : base(dictionaryName)
+        {
+            _registryKey = OpenDesiredSubKey(registerKey, dictionaryName);
+        }
 
         /// <summary>
         /// Sets a new value for the specific key.
@@ -26,6 +36,8 @@ namespace Ridavei.Settings.Registry.Settings
         /// <param name="value"></param>
         protected override void SetValue(string key, string value)
         {
+            _registryKey.SetValue(key, value, RegistryValueKind.String);
+            _registryKey.Flush();
         }
 
         /// <summary>
@@ -36,8 +48,8 @@ namespace Ridavei.Settings.Registry.Settings
         /// <returns>True if key exists, else false.</returns>
         protected override bool TryGetValue(string key, out string value)
         {
-            value = null;
-            return false;
+            value = _registryKey.GetValue(key) as string;
+            return !string.IsNullOrWhiteSpace(value);
         }
 
         /// <summary>
@@ -45,7 +57,23 @@ namespace Ridavei.Settings.Registry.Settings
         /// </summary>
         protected override IReadOnlyDictionary<string, string> GetAllValues()
         {
-            return null;
+            var res = new Dictionary<string, string>();
+            foreach (var valueName in _registryKey.GetValueNames())
+            {
+                var value = _registryKey.GetValue(valueName) as string;
+                res.Add(valueName, value);
+            }
+            return res;
+        }
+
+        private RegistryKey OpenDesiredSubKey(RegistryKey registryKey, string dictionaryName)
+        {
+            string subKeyName = string.Concat(SubKeyName, "\\", dictionaryName);
+            var res = registryKey.OpenSubKey(subKeyName, true);
+            if (res == null)
+                res = registryKey.CreateSubKey(subKeyName, true);
+
+            return res;
         }
     }
 }
