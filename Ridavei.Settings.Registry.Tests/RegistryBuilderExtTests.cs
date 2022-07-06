@@ -1,7 +1,9 @@
 ﻿using System;
+
+using Ridavei.Settings.Registry.Enums;
+
 using Microsoft.Win32;
 using NUnit.Framework;
-using Ridavei.Settings.Registry.Enums;
 using Shouldly;
 
 namespace Ridavei.Settings.Registry.Tests
@@ -28,9 +30,8 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.Throw<NotSupportedException>(() =>
             {
-                SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(RegistryKeyType.LocalMachine | RegistryKeyType.CurrentUser);
+                using (var settings = SettingsBuilder.CreateBuilder())
+                    settings.UseRegistryManager(RegistryKeyType.LocalMachine | RegistryKeyType.CurrentUser);
             });
         }
 
@@ -40,11 +41,11 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.NotThrow(() =>
             {
-                SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(registryKeyType)
-                    .GetSettings("Test")
-                    .ShouldNotBeNull();
+                using (var settings = SettingsBuilder.CreateBuilder())
+                    settings
+                        .UseRegistryManager(registryKeyType)
+                        .GetSettings("Test")
+                        .ShouldNotBeNull();
             });
         }
 
@@ -54,12 +55,14 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.NotThrow(() =>
             {
-                var settings = SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(registryKeyType)
-                    .GetSettings("Test");
-                settings.ShouldNotBeNull();
-                settings.Set("T1", "T2");
+                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                {
+                    var settings = settingsBuilder
+                        .UseRegistryManager(registryKeyType)
+                        .GetSettings("Test");
+                    settings.ShouldNotBeNull();
+                    settings.Set("T1", "T2");
+                }
             });
         }
 
@@ -69,15 +72,17 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.NotThrow(() =>
             {
-                string key = "T1";
-                string value = "T2";
-                var settings = SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(registryKeyType)
-                    .GetSettings("Test");
-                settings.ShouldNotBeNull();
-                settings.Set(key, value);
-                settings.Get(key).ShouldBe(value);
+                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                {
+                    string key = "T1";
+                    string value = "T2";
+                    var settings = settingsBuilder
+                        .UseRegistryManager(registryKeyType)
+                        .GetSettings("Test");
+                    settings.ShouldNotBeNull();
+                    settings.Set(key, value);
+                    settings.Get(key).ShouldBe(value);
+                }
             });
         }
 
@@ -87,14 +92,16 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.NotThrow(() =>
             {
-                var settings = SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(registryKeyType)
-                    .GetSettings("Test");
-                settings.ShouldNotBeNull();
-                var dict = settings.GetAll();
-                dict.ShouldNotBeNull();
-                dict.Count.ShouldBe(0);
+                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                {
+                    var settings = settingsBuilder
+                        .UseRegistryManager(registryKeyType)
+                        .GetSettings("Test");
+                    settings.ShouldNotBeNull();
+                    var dict = settings.GetAll();
+                    dict.ShouldNotBeNull();
+                    dict.Count.ShouldBe(0);
+                }
             });
         }
 
@@ -104,19 +111,21 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.NotThrow(() =>
             {
-                string key = "T1";
-                string value = "T2";
-                var settings = SettingsBuilder
-                    .CreateBuilder()
-                    .UseRegistryManager(registryKeyType)
-                    .GetSettings("Test");
-                settings.ShouldNotBeNull();
-                settings.Set(key, value);
-                var dict = settings.GetAll();
-                dict.ShouldNotBeNull();
-                dict.Count.ShouldBe(1);
-                dict.ContainsKey(key).ShouldBeTrue();
-                dict[key].ShouldBe(value);
+                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                {
+                    string key = "T1";
+                    string value = "T2";
+                    var settings = settingsBuilder
+                        .UseRegistryManager(registryKeyType)
+                        .GetSettings("Test");
+                    settings.ShouldNotBeNull();
+                    settings.Set(key, value);
+                    var dict = settings.GetAll();
+                    dict.ShouldNotBeNull();
+                    dict.Count.ShouldBe(1);
+                    dict.ContainsKey(key).ShouldBeTrue();
+                    dict[key].ShouldBe(value);
+                }
             });
         }
 

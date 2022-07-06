@@ -32,7 +32,7 @@ namespace Ridavei.Settings.Registry.Manager
         /// <param name="dictionaryName">Name of the dictionary</param>
         /// <returns>Settings</returns>
         /// <exception cref="NotSupportedException">Throwed when the selected <see cref="RegistryKeyType"/> was not supported.</exception>
-        protected override ISettings GetSettingsObject(string dictionaryName)
+        protected override ASettings GetSettingsObject(string dictionaryName)
         {
             return new RegistrySettings(dictionaryName, _registerKey);
         }
@@ -54,6 +54,13 @@ namespace Ridavei.Settings.Registry.Manager
                 default:
                     throw new NotSupportedException($"The provided value for enum RegisterKeyType is not supported (value: {registerKeyType}).");
             };
+        }
+
+        public override void Dispose()
+        {
+            _registerKey.Dispose();
+
+            base.Dispose();
         }
     }
 }

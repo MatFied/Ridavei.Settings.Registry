@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Ridavei.Settings.Registry.Enums;
-
 using Ridavei.Settings.Base;
 
 using Microsoft.Win32;
@@ -14,7 +12,7 @@ namespace Ridavei.Settings.Registry.Settings
     /// </summary>
     internal class RegistrySettings : ASettings
     {
-        private const string SubKeyName = "Software\\Ridavei\\Settings";
+        private const string BaseSubKeyName = "Software\\Ridavei\\Settings";
         private readonly RegistryKey _registryKey;
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace Ridavei.Settings.Registry.Settings
         /// <returns>True if key exists, else false.</returns>
         protected override bool TryGetValue(string key, out string value)
         {
-            value = _registryKey.GetValue(key) as string;
+            value = (string)_registryKey.GetValue(key);
             return !string.IsNullOrWhiteSpace(value);
         }
 
@@ -58,10 +56,7 @@ namespace Ridavei.Settings.Registry.Settings
         {
             var res = new Dictionary<string, string>();
             foreach (var valueName in _registryKey.GetValueNames())
-            {
-                var value = _registryKey.GetValue(valueName) as string;
-                res.Add(valueName, value);
-            }
+                res.Add(valueName, (string)_registryKey.GetValue(valueName));
             return res;
         }
 
@@ -73,12 +68,19 @@ namespace Ridavei.Settings.Registry.Settings
         /// <returns></returns>
         private RegistryKey OpenSubKey(RegistryKey registryKey, string dictionaryName)
         {
-            string subKeyName = string.Concat(SubKeyName, "\\", dictionaryName);
+            string subKeyName = string.Concat(BaseSubKeyName, "\\", dictionaryName);
             var res = registryKey.OpenSubKey(subKeyName, true);
             if (res == null)
                 res = registryKey.CreateSubKey(subKeyName, true);
 
             return res;
+        }
+
+        public override void Dispose()
+        {
+            _registryKey.Dispose();
+
+            base.Dispose();
         }
     }
 }

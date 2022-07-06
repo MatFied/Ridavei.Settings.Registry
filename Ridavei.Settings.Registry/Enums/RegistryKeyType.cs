@@ -10,7 +10,7 @@
         /// </summary>
         CurrentUser = 1,
         /// <summary>
-        /// Reads from the HKEY_CURRENT_USER registry base.
+        /// Reads from the HKEY_LOCAL_MACHINE registry base.
         /// </summary>
         LocalMachine = 2
     }

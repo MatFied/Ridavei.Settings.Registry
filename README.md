@@ -1,6 +1,7 @@
 # Ridavei.Settings.Registry
 
-Builder extension to store settings keys and values in Windows Registry.
+Builder extension to store settings keys and values in Windows Registry.\
+To use the "HKEY_LOCAL_MACHINE" registry base the program needs to run under administration privilages.
 
 ## Examples of use
 
@@ -15,14 +16,16 @@ namespace TestProgram
     {
         public static void Main(string[] args)
         {
-            ISettings settings = SettingsBuilder
-                .CreateBuilder()
-                .UseRegistryManager()
-                .GetSettings("DictionaryName");
+            using (SettingsBuilder settingsBuilder = SettingsBuilder.CreateBuilder())
+            {
+                ISettings settings = settingsBuilder
+                    .UseRegistryManager()
+                    .GetSettings("DictionaryName");
 
-            //You can use settings.Get("ExampleKey", "DefaultValue") if you want to retrieve the default value if the key doesn't exists.
-            string value = settings.Get("ExampleKey");
-            settings.Set("AnotherKey", "NewValue");
+                //You can use settings.Get("ExampleKey", "DefaultValue") if you want to retrieve the default value if the key doesn't exists.
+                string value = settings.Get("ExampleKey");
+                settings.Set("AnotherKey", "NewValue");
+            }
         }
     }
 }
