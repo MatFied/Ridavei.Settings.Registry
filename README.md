@@ -19,6 +19,7 @@ namespace TestProgram
             using (SettingsBuilder settingsBuilder = SettingsBuilder.CreateBuilder())
             {
                 ISettings settings = settingsBuilder
+                    //You can call UseRegistryManager(RegistryKeyType.LocalMachine) if you need to use "HKEY_LOCAL_MACHINE"
                     .UseRegistryManager()
                     .GetSettings("DictionaryName");
 
