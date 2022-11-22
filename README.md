@@ -4,7 +4,7 @@
 [![NuGet Badge Ridavei.Settings.Registry](https://buildstats.info/nuget/Ridavei.Settings.Registry)](https://www.nuget.org/packages/Ridavei.Settings.Registry)
 
 Builder extension to store settings keys and values in Windows Registry.\
-To use the "HKEY_LOCAL_MACHINE" registry base the program needs to run under administration privilages.
+To use the `HKEY_LOCAL_MACHINE` registry base the program needs to run under administration privilages.
 
 ## Examples of use
 
