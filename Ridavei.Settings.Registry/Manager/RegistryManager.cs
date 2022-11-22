@@ -4,7 +4,6 @@ using Ridavei.Settings.Registry.Enums;
 using Ridavei.Settings.Registry.Settings;
 
 using Ridavei.Settings.Base;
-using Ridavei.Settings.Interface;
 
 using Microsoft.Win32;
 
@@ -26,15 +25,16 @@ namespace Ridavei.Settings.Registry.Manager
             _registerKey = GetRegistryBase(registryKeyType);
         }
 
-        /// <summary>
-        /// Retrieves the <see cref="ISettings"/> object for the specifed dictionary name.
-        /// </summary>
-        /// <param name="dictionaryName">Name of the dictionary</param>
-        /// <returns>Settings</returns>
-        /// <exception cref="NotSupportedException">Throwed when the selected <see cref="RegistryKeyType"/> was not supported.</exception>
-        protected override ASettings GetSettingsObject(string dictionaryName)
+        /// <inheritdoc/>
+        protected override bool TryGetSettingsObject(string dictionaryName, out ASettings settings)
         {
-            return new RegistrySettings(dictionaryName, _registerKey);
+            return RegistrySettings.TryGetSettings(dictionaryName, _registerKey, out settings);
+        }
+
+        /// <inheritdoc/>
+        protected override ASettings CreateSettingsObject(string dictionaryName)
+        {
+            return RegistrySettings.CreateSettings(dictionaryName, _registerKey);
         }
 
         /// <summary>
@@ -54,13 +54,6 @@ namespace Ridavei.Settings.Registry.Manager
                 default:
                     throw new NotSupportedException($"The provided value for enum RegisterKeyType is not supported (value: {registerKeyType}).");
             };
-        }
-
-        public override void Dispose()
-        {
-            _registerKey.Dispose();
-
-            base.Dispose();
         }
     }
 }

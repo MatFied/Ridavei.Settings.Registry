@@ -1,5 +1,7 @@
 ﻿using System;
 
+using Ridavei.Settings.Exceptions;
+
 using Ridavei.Settings.Registry.Enums;
 
 using Microsoft.Win32;
@@ -12,6 +14,7 @@ namespace Ridavei.Settings.Registry.Tests
     public class RegistryBuilderExtTests
     {
         private const string SubKeyName = "Software\\Ridavei";
+        private const string DictionaryName = "Test";
 
         [SetUp]
         public void SetUp()
@@ -30,36 +33,40 @@ namespace Ridavei.Settings.Registry.Tests
         {
             Should.Throw<NotSupportedException>(() =>
             {
-                using (var settings = SettingsBuilder.CreateBuilder())
-                    settings.UseRegistryManager(RegistryKeyType.LocalMachine | RegistryKeyType.CurrentUser);
+                var builder = SettingsBuilder.CreateBuilder();
+                builder.UseRegistryManager(RegistryKeyType.LocalMachine | RegistryKeyType.CurrentUser);
             });
         }
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public void UseRegistryManager__RetrieveSettings(RegistryKeyType registryKeyType)
+        public void GetSettings_NonExistingDictionary__RaiseException(RegistryKeyType registryKeyType)
         {
-            Should.NotThrow(() =>
+            Should.Throw<DictionaryNotFoundException>(() =>
             {
-                using (var settings = SettingsBuilder.CreateBuilder())
-                    settings
-                        .UseRegistryManager(registryKeyType)
-                        .GetSettings("Test")
-                        .ShouldNotBeNull();
+                GetBuilder(registryKeyType).GetSettings(DictionaryName);
             });
         }
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public void UseRegistryManager_Set__NoException(RegistryKeyType registryKeyType)
+        public void GetOrCreateSettings__RetrieveSettings(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
-                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                using (var settings = GetBuilder(registryKeyType).GetOrCreateSettings(DictionaryName))
+                    settings.ShouldNotBeNull();
+            });
+        }
+
+        [TestCase(RegistryKeyType.LocalMachine)]
+        [TestCase(RegistryKeyType.CurrentUser)]
+        public void Set__NoException(RegistryKeyType registryKeyType)
+        {
+            Should.NotThrow(() =>
+            {
+                using (var settings = GetBuilder(registryKeyType).GetOrCreateSettings(DictionaryName))
                 {
-                    var settings = settingsBuilder
-                        .UseRegistryManager(registryKeyType)
-                        .GetSettings("Test");
                     settings.ShouldNotBeNull();
                     settings.Set("T1", "T2");
                 }
@@ -68,17 +75,14 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public void UseRegistryManager_Get__GetValue(RegistryKeyType registryKeyType)
+        public void Get__GetValue(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
-                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                string key = "T1";
+                string value = "T2";
+                using (var settings = GetBuilder(registryKeyType).GetOrCreateSettings(DictionaryName))
                 {
-                    string key = "T1";
-                    string value = "T2";
-                    var settings = settingsBuilder
-                        .UseRegistryManager(registryKeyType)
-                        .GetSettings("Test");
                     settings.ShouldNotBeNull();
                     settings.Set(key, value);
                     settings.Get(key).ShouldBe(value);
@@ -88,15 +92,12 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public void UseRegistryManager_GetAll_Empty__GetEmptyDictionary(RegistryKeyType registryKeyType)
+        public void GetAll_Empty__GetEmptyDictionary(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
-                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                using (var settings = GetBuilder(registryKeyType).GetOrCreateSettings(DictionaryName))
                 {
-                    var settings = settingsBuilder
-                        .UseRegistryManager(registryKeyType)
-                        .GetSettings("Test");
                     settings.ShouldNotBeNull();
                     var dict = settings.GetAll();
                     dict.ShouldNotBeNull();
@@ -107,17 +108,14 @@ namespace Ridavei.Settings.Registry.Tests
 
         [TestCase(RegistryKeyType.LocalMachine)]
         [TestCase(RegistryKeyType.CurrentUser)]
-        public void UseRegistryManager_GetAll__GetDictionary(RegistryKeyType registryKeyType)
+        public void GetAll__GetDictionary(RegistryKeyType registryKeyType)
         {
             Should.NotThrow(() =>
             {
-                using (var settingsBuilder = SettingsBuilder.CreateBuilder())
+                string key = "T1";
+                string value = "T2";
+                using (var settings = GetBuilder(registryKeyType).GetOrCreateSettings(DictionaryName))
                 {
-                    string key = "T1";
-                    string value = "T2";
-                    var settings = settingsBuilder
-                        .UseRegistryManager(registryKeyType)
-                        .GetSettings("Test");
                     settings.ShouldNotBeNull();
                     settings.Set(key, value);
                     var dict = settings.GetAll();
@@ -144,6 +142,13 @@ namespace Ridavei.Settings.Registry.Tests
                 registryKey.DeleteSubKeyTree(string.Empty, false);
                 registryKey.Flush();
             }
+        }
+
+        private SettingsBuilder GetBuilder(RegistryKeyType registryKeyType)
+        {
+            return SettingsBuilder
+                .CreateBuilder()
+                .UseRegistryManager(registryKeyType);
         }
     }
 }
