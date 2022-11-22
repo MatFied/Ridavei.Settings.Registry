@@ -12,19 +12,46 @@ namespace Ridavei.Settings.Registry.Settings
     /// </summary>
     internal class RegistrySettings : ASettings
     {
-        private const string BaseSubKeyName = "Software\\Ridavei\\Settings";
-        private readonly RegistryKey _registryKey;
+        private const string BaseSubKeyName = "Software\\Ridavei\\Settings\\";
+
+        private RegistryKey _registryKey;
+
+        /// <summary>
+        /// Retrieves the <see cref="ASettings"/> object for the specifed dictionary name.
+        /// </summary>
+        /// <param name="dictionaryName">Name of the dictionary</param>
+        /// <param name="registryBase">Registry base</param>
+        /// <param name="settings">Retrieved settings</param>
+        /// <exception cref="ArgumentNullException">Throwed when the name of the dictionary is null, empty or whitespace.</exception>
+        public static bool TryGetSettings(string dictionaryName, RegistryKey registryBase, out ASettings settings)
+        {
+            settings = new RegistrySettings(dictionaryName);
+
+            return ((RegistrySettings)settings).TryGetRegistry(dictionaryName, registryBase, out _);
+        }
+
+        /// <summary>
+        /// Creates registry sub key for the specific dictionary name.
+        /// </summary>
+        /// <param name="dictionaryName">Name of the dictionary</param>
+        /// <param name="registryBase">Registry base</param>
+        /// <exception cref="ArgumentNullException">Throwed when the name of the dictionary is null, empty or whitespace.</exception>
+        public static RegistrySettings CreateSettings(string dictionaryName, RegistryKey registryBase)
+        {
+            var res = new RegistrySettings(dictionaryName);
+
+            if (!res.TryGetRegistry(dictionaryName, registryBase, out var subKeyName))
+                res.CreateRegistry(registryBase, subKeyName);
+
+            return res;
+        }
 
         /// <summary>
         /// The default constructor for <see cref="RegistrySettings"/> class.
         /// </summary>
         /// <param name="dictionaryName">Name of the dictionary</param>
-        /// <param name="registryKey">Registry base</param>
         /// <exception cref="ArgumentNullException">Throwed when the name of the dictionary is null, empty or whitespace.</exception>
-        public RegistrySettings(string dictionaryName, RegistryKey registryKey) : base(dictionaryName)
-        {
-            _registryKey = OpenSubKey(registryKey, dictionaryName);
-        }
+        internal RegistrySettings(string dictionaryName) : base(dictionaryName) { }
 
         /// <summary>
         /// Sets a new value for the specific key.
@@ -61,26 +88,38 @@ namespace Ridavei.Settings.Registry.Settings
         }
 
         /// <summary>
-        /// Opens or creates registry sub key for the specific dictionary name.
+        /// Tries to get the registry sub key for the specific dictionary name.
         /// </summary>
-        /// <param name="registryKey">Registry base</param>
+        /// <param name="registryBase">Registry base</param>
         /// <param name="dictionaryName">Name of the dictionary</param>
-        /// <returns></returns>
-        private RegistryKey OpenSubKey(RegistryKey registryKey, string dictionaryName)
+        /// <param name="subKeyName">Retrieved sub key name</param>
+        /// <returns>True if the registry exists or false if not</returns>
+        private bool TryGetRegistry(string dictionaryName, RegistryKey registryBase, out string subKeyName)
         {
-            string subKeyName = string.Concat(BaseSubKeyName, "\\", dictionaryName);
-            var res = registryKey.OpenSubKey(subKeyName, true);
-            if (res == null)
-                res = registryKey.CreateSubKey(subKeyName, true);
-
-            return res;
+            subKeyName = string.Concat(BaseSubKeyName, dictionaryName);
+            _registryKey = registryBase.OpenSubKey(subKeyName, true);
+            return _registryKey != null;
         }
 
-        public override void Dispose()
+        /// <summary>
+        /// Creates the registry sub key for the specific dictionary name.
+        /// </summary>
+        /// <param name="registryBase">Registry base</param>
+        /// <param name="subKeyName">Sub key name</param>
+        private void CreateRegistry(RegistryKey registryBase, string subKeyName)
         {
-            _registryKey.Dispose();
+            _registryKey = registryBase.CreateSubKey(subKeyName, true);
+        }
 
-            base.Dispose();
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                if (_registryKey != null)
+                {
+                    _registryKey.Dispose();
+                    _registryKey = null;
+                }
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Ridavei.Settings.Registry.Enums
 {
     /// <summary>
-    /// Enum to choose one of the registry base.
+    /// Enum to choose one of the registry bases.
     /// </summary>
     public enum RegistryKeyType
     {
