@@ -10,8 +10,7 @@ To use the `HKEY_LOCAL_MACHINE` registry base the program needs to run under adm
 
 ```csharp
 using Ridavei.Settings;
-using Ridavei.Settings.Base;
-
+using Ridavei.Settings.Interfaces;
 using Ridavei.Settings.Registry;
 
 namespace TestProgram
@@ -24,7 +23,7 @@ namespace TestProgram
                 .CreateBuilder()
                 //You can call UseRegistryManager(RegistryKeyType.LocalMachine) if you need to use "HKEY_LOCAL_MACHINE"
                 .UseRegistryManager();
-            using (ASettings settings = builder.GetSettings("DictionaryName"))
+            using (ISettings settings = builder.GetSettings("DictionaryName"))
             {
                 //You can use settings.Get("ExampleKey", "DefaultValue") if you want to retrieve the default value if the key doesn't exists.
                 string value = settings.Get("ExampleKey");
